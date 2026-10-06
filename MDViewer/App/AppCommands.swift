@@ -9,6 +9,7 @@ extension FocusedValues {
 /// Menu bar commands and their keyboard shortcuts. Commands act on the focused window.
 struct AppCommands: Commands {
     let model: AppModel
+    let updater: Updater
     @FocusedValue(\.windowState) private var focusedWindow
     @Environment(\.openWindow) private var openWindow
     @AppStorage(SettingsKey.fontSize) private var fontSize = Double(ReaderStyle.defaultFontSize)
@@ -18,6 +19,11 @@ struct AppCommands: Commands {
 
     var body: some Commands {
         let _ = model.presentWindow = model.presentWindow ?? { [openWindow] id in openWindow(id: "workspace", value: id) }
+        CommandGroup(after: .appInfo) {
+            Button("Check for Updates…") { updater.checkForUpdates() }
+                .disabled(!updater.canCheckForUpdates)
+        }
+
         CommandGroup(replacing: .newItem) {
             Button("New Window") { model.newWindow() }
                 .keyboardShortcut("n")

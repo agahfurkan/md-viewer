@@ -28,6 +28,12 @@
     <string>NSApplication</string>
     <key>NSHumanReadableCopyright</key>
     <string></string>
+    <key>SUFeedURL</key>
+    <string>https://github.com/agahfurkan/md-viewer/releases/latest/download/appcast.xml</string>
+    <key>SUPublicEDKey</key>
+    <string>IJPwT0xc6YNQtPahVN9PTW/V/B6BkjAjOLu0mJn2gsA=</string>
+    <key>SUEnableAutomaticChecks</key>
+    <true/>
     <key>CFBundleDocumentTypes</key>
     <array>
         <dict>

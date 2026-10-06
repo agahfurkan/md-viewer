@@ -24,11 +24,11 @@ struct MarkdownViewerApp: App {
         // this SwiftUI would also open a new window for each one.
         .handlesExternalEvents(matching: [])
         .commands {
-            AppCommands(model: appDelegate.model)
+            AppCommands(model: appDelegate.model, updater: appDelegate.updater)
         }
 
         Settings {
-            SettingsView()
+            SettingsView(updater: appDelegate.updater)
         }
     }
 }
@@ -57,6 +57,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) static weak var current: AppDelegate?
 
     let model: AppModel
+    let updater: Updater
     private var keyMonitor: Any?
 
     override init() {
@@ -67,6 +68,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             recentFiles: RecentFilesManager(defaults: isTesting ? UserDefaults(suiteName: "MDViewer.hostedTests") ?? .standard : .standard),
             sessionManager: sessionManager
         )
+        updater = Updater(startingUpdater: !isTesting)
         super.init()
         Self.current = self
         // Restore before any open-file events arrive so they are added after the session's tabs.

@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @Bindable var updater: Updater
     @AppStorage(SettingsKey.appearance) private var appearance = AppearancePreference.system.rawValue
     @AppStorage(SettingsKey.fontSize) private var fontSize = Double(ReaderStyle.defaultFontSize)
     @AppStorage(SettingsKey.fontDesign) private var fontDesign = ReaderFontDesign.system.rawValue
@@ -34,6 +35,21 @@ struct SettingsView: View {
 
             Picker("Reading width:", selection: $readingWidth) {
                 ForEach(ReadingWidth.allCases) { Text($0.title).tag($0.rawValue) }
+            }
+
+            Divider()
+                .padding(.vertical, 4)
+
+            LabeledContent("Updates:") {
+                VStack(alignment: .leading, spacing: 8) {
+                    Toggle("Check for updates automatically", isOn: $updater.automaticallyChecksForUpdates)
+                    HStack {
+                        Button("Check Now") { updater.checkForUpdates() }
+                            .disabled(!updater.canCheckForUpdates)
+                        Text("Version \(Updater.currentVersion)")
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
         }
         .padding(24)

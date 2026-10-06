@@ -18,7 +18,7 @@ MDViewer/
 ├── UI/         MainWindow, TabBar, ReaderView, ReaderFindClient, CodeBlockView,
 │               SourceEditorView (+ line numbers), OutlineView, MissingFileView, SettingsView
 ├── Services/   LinkHandler (LinkResolver), ThemeManager (settings, palette), SessionPersistence,
-│               ImageLoader, MathRenderer, MermaidRenderer
+│               ImageLoader, MathRenderer, MermaidRenderer, Updater (Sparkle)
 └── Resources/  Assets, Mermaid/mermaid.min.js (11.12.0, MIT)
 ```
 
@@ -124,6 +124,13 @@ unsandboxed. Bookmarks are still stored (security-scoped when possible): restora
 files moved while the app was closed, and the stored **path wins** when a file exists there
 (tools replace files). If the sandbox is ever enabled, `FolderAccessManager` activates: the reader
 offers to grant access to a document's folder, and grants persist as security-scoped bookmarks.
+
+**Updates** use Sparkle (`Updater`). The feed is `appcast.xml` attached to the latest GitHub
+release (`SUFeedURL`); each update archive is signed with an EdDSA key whose public half is
+`SUPublicEDKey` in Info.plist and whose private half lives in the release machine's keychain.
+Sparkle installs an update only if that signature matches, so the app itself can stay ad-hoc
+signed. `scripts/release.sh` builds, zips, signs and publishes a release with its feed. The
+updater isn't started when hosting tests.
 
 **Recent files** are app-managed (`RecentFilesManager`, UserDefaults) rather than
 `NSDocumentController`, which would take over file-open routing.

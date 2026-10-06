@@ -34,6 +34,21 @@ open "build/DerivedData/Build/Products/Release/MD Viewer.app"
 To make it the default for Markdown files: Finder → Get Info on any `.md` file → Open with →
 MD Viewer → Change All.
 
+Once installed, the app updates itself: it checks daily (Settings → Updates; or MD Viewer →
+Check for Updates…) and installs new versions from this repo's GitHub releases.
+
+## Release
+
+1. Raise `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` (the build number must increase —
+   it's what the updater compares), and commit.
+2. Run `scripts/release.sh`. It builds, tags `v<version>`, zips the app, signs the zip and
+   writes `appcast.xml` with Sparkle's `generate_appcast`, pushes, and creates the GitHub release.
+
+Update archives are signed with the EdDSA key stored in the login keychain under the account
+`MDViewer`. Keep a copy of it somewhere safe (`generate_keys --account MDViewer -x <file>` from
+`build/DerivedData/SourcePackages/artifacts/sparkle/Sparkle/bin`): without it, installed copies
+can't be updated.
+
 ## Test
 
 ```bash
