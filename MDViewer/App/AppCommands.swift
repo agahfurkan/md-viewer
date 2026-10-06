@@ -10,12 +10,14 @@ extension FocusedValues {
 struct AppCommands: Commands {
     let model: AppModel
     @FocusedValue(\.windowState) private var focusedWindow
+    @Environment(\.openWindow) private var openWindow
     @AppStorage(SettingsKey.fontSize) private var fontSize = Double(ReaderStyle.defaultFontSize)
 
     private var window: WindowState? { focusedWindow }
     private var document: DocumentSession? { focusedWindow?.activeDocument }
 
     var body: some Commands {
+        let _ = model.presentWindow = model.presentWindow ?? { [openWindow] id in openWindow(id: "workspace", value: id) }
         CommandGroup(replacing: .newItem) {
             Button("New Window") { model.newWindow() }
                 .keyboardShortcut("n")

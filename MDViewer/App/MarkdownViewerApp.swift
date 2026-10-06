@@ -20,6 +20,9 @@ struct MarkdownViewerApp: App {
         .defaultSize(width: 1100, height: 780)
         .windowToolbarStyle(.unified(showsTitle: true))
         .restorationBehavior(.disabled)
+        // Files opened from Finder or the Dock are opened as tabs by the app delegate; without
+        // this SwiftUI would also open a new window for each one.
+        .handlesExternalEvents(matching: [])
         .commands {
             AppCommands(model: appDelegate.model)
         }
@@ -102,6 +105,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private static let digitKeyCodes: [UInt16: Int] = [18: 1, 19: 2, 20: 3, 21: 4, 23: 5, 22: 6, 26: 7, 28: 8, 25: 9]
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        // When launched by opening a file, SwiftUI shows no window (the scene doesn't handle
+        // external events), so show the launch window here.
+        DispatchQueue.main.async { [model] in model.presentLaunchWindowIfNeeded() }
+    }
 
     func application(_ application: NSApplication, open urls: [URL]) {
         let fileURLs = urls.filter(\.isFileURL)

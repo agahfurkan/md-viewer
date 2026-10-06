@@ -13,7 +13,8 @@ final class AppModel {
     @ObservationIgnored let documentManager: DocumentManager
     @ObservationIgnored let recentFiles: RecentFilesManager
     @ObservationIgnored let sessionManager: SessionManager
-    /// Opens a SwiftUI window for a window state. Provided by the first window that appears.
+    /// Opens a SwiftUI window for a window state. Provided by the menu commands, which exist
+    /// before any window does, and by each window as it appears.
     @ObservationIgnored var presentWindow: ((UUID) -> Void)?
     /// Windows whose SwiftUI window currently exists.
     @ObservationIgnored private var presentedIDs: Set<UUID> = []
@@ -112,6 +113,13 @@ final class AppModel {
         windows.removeAll { $0 === state }
         if lastActiveWindow === state { lastActiveWindow = remaining.last }
         sessionManager.scheduleSave()
+    }
+
+    /// Shows the launch window if no window is on screen yet. Presenting a window that is
+    /// already shown just brings it forward.
+    func presentLaunchWindowIfNeeded() {
+        guard presentedIDs.isEmpty else { return }
+        presentWindow?(launchWindowID)
     }
 
     /// Creates a new empty window.

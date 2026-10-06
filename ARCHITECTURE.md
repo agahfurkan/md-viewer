@@ -101,7 +101,12 @@ around the actions (panels, alerts) lives in `UserActions`.
 SwiftUI's `WindowGroup(for: UUID.self)` shows one `WindowState` per window. SwiftUI's own window
 restoration is disabled — the session file restores windows — and the `defaultValue` for the
 launch window is a fixed ID, because SwiftUI evaluates it more than once and runs it during view
-updates (so it must not mutate observed state).
+updates (so it must not mutate observed state). The scene handles no external events
+(`handlesExternalEvents(matching: [])`), so files opened from Finder or the Dock don't make SwiftUI
+open a new window; the app delegate opens them as tabs in the last active window. Because SwiftUI
+then shows no window when the app is launched by opening a file, the delegate presents the launch
+window after launch if none is on screen (`openWindow` comes from the menu commands, which exist
+before any window).
 
 **File identity.** Files are tracked by canonical URL (standardized, symlinks resolved), and
 duplicates are also detected via `fileResourceIdentifier` (case-insensitive volumes, hard links).
