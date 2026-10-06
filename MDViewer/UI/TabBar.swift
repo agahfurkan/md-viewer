@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Browser-style document tabs: click to activate, close button, drag to reorder, context menu.
+/// Browser-style document tabs: click to activate, close button or middle-click to close, drag to reorder, context menu.
 struct TabBar: View {
     let windowState: WindowState
     @State private var draggingID: UUID?
@@ -100,6 +100,7 @@ private struct TabItem: View {
         }
         .contentShape(Rectangle())
         .onTapGesture { windowState.activate(session.id) }
+        .overlay { MiddleClickHandler { UserActions.requestClose(session, windowState: windowState) } }
         .onHover { isHovering = $0 }
         .help(session.fileURL.path)
         .contextMenu { contextMenu }
@@ -180,6 +181,44 @@ private struct TabCloseButtonStyle: ButtonStyle {
                     .fill(Color.primary.opacity(configuration.isPressed ? 0.16 : (isHovering ? 0.09 : 0)))
             )
             .onHover { isHovering = $0 }
+    }
+}
+
+/// Runs `action` on a middle-button click. SwiftUI has no middle-click gesture, so this bridges to AppKit.
+private struct MiddleClickHandler: NSViewRepresentable {
+    let action: () -> Void
+
+    func makeNSView(context: Context) -> MiddleClickView {
+        let view = MiddleClickView()
+        view.action = action
+        return view
+    }
+
+    func updateNSView(_ nsView: MiddleClickView, context: Context) {
+        nsView.action = action
+    }
+
+    final class MiddleClickView: NSView {
+        var action: (() -> Void)?
+        private var isTrackingClick = false
+
+        /// Only claim other-button clicks so left clicks, drags, hover and context menus reach SwiftUI.
+        override func hitTest(_ point: NSPoint) -> NSView? {
+            switch NSApp.currentEvent?.type {
+            case .otherMouseDown, .otherMouseUp, .otherMouseDragged: return super.hitTest(point)
+            default: return nil
+            }
+        }
+
+        override func otherMouseDown(with event: NSEvent) {
+            if event.buttonNumber == 2 { isTrackingClick = true } else { super.otherMouseDown(with: event) }
+        }
+
+        override func otherMouseUp(with event: NSEvent) {
+            guard event.buttonNumber == 2 else { return super.otherMouseUp(with: event) }
+            defer { isTrackingClick = false }
+            if isTrackingClick, bounds.contains(convert(event.locationInWindow, from: nil)) { action?() }
+        }
     }
 }
 
