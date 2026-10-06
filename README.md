@@ -19,6 +19,28 @@ Markdown produced by tools and AI agents (`PLAN.md`, `README.md`, generated docs
 
 Requires macOS 15 or later.
 
+## Install
+
+1. Download `MD-Viewer-<version>.zip` from the
+   [latest release](https://github.com/agahfurkan/md-viewer/releases/latest) and unzip it.
+2. Move **MD Viewer.app** to `/Applications`.
+3. Open it. The app isn't notarized by Apple, so the first launch is blocked with a warning:
+   click **Done**, then open System Settings → Privacy & Security, scroll to the message about
+   MD Viewer and click **Open Anyway**, then confirm. This is needed only once.
+
+   Or, from Terminal, before the first launch:
+
+   ```bash
+   xattr -dr com.apple.quarantine "/Applications/MD Viewer.app"
+   ```
+
+To make it the default for Markdown files: Finder → Get Info on any `.md` file → Open with →
+MD Viewer → Change All.
+
+The app updates itself: it checks daily and installs new versions from this repo's releases
+(Settings → Updates to turn this off or check now; or MD Viewer → Check for Updates…). Updates
+don't need the step above again.
+
 ## Build and run
 
 Open `MDViewer.xcodeproj` in Xcode and run the **MDViewer** scheme, or:
@@ -30,12 +52,6 @@ xcodebuild -project MDViewer.xcodeproj -scheme MDViewer -configuration Release -
 ```bash
 open "build/DerivedData/Build/Products/Release/MD Viewer.app"
 ```
-
-To make it the default for Markdown files: Finder → Get Info on any `.md` file → Open with →
-MD Viewer → Change All.
-
-Once installed, the app updates itself: it checks daily (Settings → Updates; or MD Viewer →
-Check for Updates…) and installs new versions from this repo's GitHub releases.
 
 ## Release
 
