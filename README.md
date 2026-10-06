@@ -57,8 +57,9 @@ open "build/DerivedData/Build/Products/Release/MD Viewer.app"
 
 1. Raise `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` (the build number must increase —
    it's what the updater compares), and commit.
-2. Run `scripts/release.sh`. It builds, tags `v<version>`, zips the app, signs the zip and
-   writes `appcast.xml` with Sparkle's `generate_appcast`, pushes, and creates the GitHub release.
+2. Run `scripts/release.sh`. It builds, checks that the built app starts, tags `v<version>`,
+   zips the app, signs the zip and writes `appcast.xml` with Sparkle's `generate_appcast`,
+   pushes, and creates the GitHub release.
 
 Update archives are signed with the EdDSA key stored in the login keychain under the account
 `MDViewer`. Keep a copy of it somewhere safe (`generate_keys --account MDViewer -x <file>` from

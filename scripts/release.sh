@@ -26,6 +26,22 @@ VERSION=$(defaults read "$PWD/$APP/Contents/Info.plist" CFBundleShortVersionStri
 BUILD=$(defaults read "$PWD/$APP/Contents/Info.plist" CFBundleVersion)
 TAG="v$VERSION"
 
+# A successful build doesn't mean the app starts (e.g. signing problems with the embedded Sparkle
+# framework only show at launch). Run it briefly, with a scratch home so the session isn't touched
+# and no update check.
+SMOKE_HOME=$(mktemp -d)
+CFFIXED_USER_HOME=$SMOKE_HOME "$APP/Contents/MacOS/MD Viewer" -SUEnableAutomaticChecks NO >/dev/null 2>&1 &
+SMOKE_PID=$!
+sleep 5
+if ! kill -0 $SMOKE_PID 2>/dev/null; then
+    echo "The built app quits at launch; not releasing. Run it from Terminal to see why:" >&2
+    echo "  \"$APP/Contents/MacOS/MD Viewer\"" >&2
+    exit 1
+fi
+kill $SMOKE_PID
+wait $SMOKE_PID 2>/dev/null || true
+rm -rf "$SMOKE_HOME"
+
 if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
     echo "Release $TAG already exists; raise the version first." >&2
     exit 1

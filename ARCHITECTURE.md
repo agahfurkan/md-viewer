@@ -129,8 +129,11 @@ offers to grant access to a document's folder, and grants persist as security-sc
 release (`SUFeedURL`); each update archive is signed with an EdDSA key whose public half is
 `SUPublicEDKey` in Info.plist and whose private half lives in the release machine's keychain.
 Sparkle installs an update only if that signature matches, so the app itself can stay ad-hoc
-signed. `scripts/release.sh` builds, zips, signs and publishes a release with its feed. The
-updater isn't started when hosting tests.
+signed. Ad-hoc code has no Team ID, so the hardened runtime's library validation would refuse
+to load `Sparkle.framework`; `Config/MDViewer.entitlements` disables library validation (and
+only that) until the app is signed with a Developer ID. `scripts/release.sh` builds, launches
+the built app to check that it starts, then zips, signs and publishes a release with its feed.
+The updater isn't started when hosting tests.
 
 **Recent files** are app-managed (`RecentFilesManager`, UserDefaults) rather than
 `NSDocumentController`, which would take over file-open routing.
